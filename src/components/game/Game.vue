@@ -18,7 +18,7 @@
             </md-field>
             <div class="input-buttons">
                 <md-button v-on:click="onStart" id="start-button" class="md-primary button" :disabled="!startActive">Start</md-button>
-                <md-button v-on:click="random" class="md-primary button" :disabled="!stopActive">Stop</md-button>
+                <md-button v-on:click="onStop" class="md-primary button" :disabled="!stopActive">Stop</md-button>
             </div>
             
             <div class="selected-actors" id="selected-actors" :style="{ width: actorsWidth + 'px' }">
@@ -49,8 +49,9 @@ export default {
           incomingNumber: '',
           numberOfActors: 0,
           actorList: JSON.parse(localStorage.getItem('actorList')),
-          actorListToPick: JSON.parse(localStorage.getItem('actorList')),
+          actorListToPick: JSON.parse(localStorage.getItem('actorsToPick')),
           actorsInPlay: [],
+          tempActorsToPick: [],
           tempActorsInPlay: [],
           randomActorIntervalId: 0,
           startActive: true,
@@ -59,6 +60,7 @@ export default {
           randomWidth: 0,
           pointsButtonVisible: false,
           selectedActorFontSize: 40,
+          addOne: false,
 
       }
   },
@@ -75,36 +77,52 @@ export default {
         const test = document.getElementById("Test");
         test.style.fontSize = size + "pt";
         test.innerHTML = name;
-        return test.clientWidth + 1;
+        let result = 0;
+        if (this.addOne) {
+          this.addOne = !this.addOne;
+          return test.clientWidth + 1;
+        } else {
+          this.addOne = !this.addOne;
+          return test.clientWidth;
+        }
     },
     checkNumber() {
         const num = parseInt(this.incomingNumber);
-        if (num <= 0 || num > this.actorList.length) {
+        if (num <= 0 || num > this.actorListToPick.length) {
             this.incomingNumber = '';
             this.startActive = false;
         } else {
             this.startActive = true;
         }
     },
-    random() {
-        this.randomWidth = this.countRandomWidth();
-        this.actorsWidth = 0;
+    onStop() {
         this.stopActive = false;
-        this.numberOfActors = parseInt(this.incomingNumber);
-        for (let i = 0; i < this.numberOfActors; i++) {
-            this.tempActorsInPlay.push(this.actorListToPick.splice(Math.round(Math.random() * (this.actorListToPick.length - 1)), 1)[0]);
-            this.actorsWidth += this.countNameLength(this.tempActorsInPlay[this.tempActorsInPlay.length - 1].name, this.selectedActorFontSize);
-        }
-        localStorage.setItem('actorsInPlay', JSON.stringify(this.tempActorsInPlay));
-        const paddingPlusMargin = 40 + 40;
-        this.actorsWidth += this.tempActorsInPlay.length * paddingPlusMargin;
-        localStorage.setItem('actorsWidth', this.actorsWidth);
+        this.random();
+        this.setRandomWidth();
         if (this.actorsWidth > this.randomWidth) {
             this.addInlineToSelectedActors();
         }
+        console.log(this.actorsInPlay);
         this.randomActorIntervalId = setInterval(() => {
             this.add();
         }, 1000);
+    },
+    random() {
+        this.actorsWidth = 0;
+        this.numberOfActors = parseInt(this.incomingNumber);
+        this.tempActorsToPick = JSON.parse(JSON.stringify(this.actorListToPick));
+        for (let i = 0; i < this.numberOfActors; i++) {
+            this.tempActorsInPlay.push(this.tempActorsToPick.splice(Math.round(Math.random() * (this.tempActorsToPick.length - 1)), 1)[0]);
+            this.actorsWidth += this.countNameLength(this.tempActorsInPlay[this.tempActorsInPlay.length - 1].name, this.selectedActorFontSize);
+        }
+        localStorage.setItem('actorsInPlay', JSON.stringify(this.tempActorsInPlay));
+    },
+    setRandomWidth() {
+        const paddingPlusMargin = 40 + 40;
+        this.randomWidth = this.countRandomWidth();
+        this.actorsWidth += this.tempActorsInPlay.length * paddingPlusMargin;
+        localStorage.setItem('actorsWidth', this.actorsWidth);
+
     },
     countRandomWidth() {
         const randomDiv = document.getElementById("random");
@@ -115,6 +133,7 @@ export default {
             let actor = this.actorList[i];
             actor.nameLength = this.countNameLength(actor.name, 16);
         }
+        localStorage.setItem('actorList', JSON.stringify(this.actorList));
     },
     addInlineToSelectedActors() {
         const selectedActors = document.getElementById("selected-actors");
@@ -123,10 +142,10 @@ export default {
     onStart() {
         this.startActive = false;
         this.count16PtNameLengths();
-        localStorage.setItem('actorList', JSON.stringify(this.actorList));
-        console.log(this.actorList);
     },
     onPoints() {
+        this.actorListToPick = this.tempActorsToPick;
+        localStorage.setItem("actorsToPick", JSON.stringify(this.actorListToPick));
         this.$router.push('/points');
     }
   },

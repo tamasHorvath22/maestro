@@ -19,13 +19,12 @@
             </div>
         </div>
         <div v-if="!showGivePoints" class="points-animation">
-            <div>
+            <div :style="{width : namesDivWidth + 'px'}" class="sumPoints">
                 <div>
                     <div class="set-height"></div>
                     <div
                         v-for="actor of this.actorList"
                         v-bind:key="actor.name"
-                        v-bind:class="{'increase-pylon': trans}"
                         :style="{ marginLeft: 50 + actor.nameLength / 2 - pylonWidth + 'px',
                                   marginRight: 50 + actor.nameLength / 2 - pylonWidth - 1 + 'px',
                                   height: actor.pylonHeight + 'px'}"
@@ -50,6 +49,12 @@
                     </span>
                 </div>
             </div>
+            <md-button 
+                class="md-primary next-scene-button"
+                v-if="showNextSceneButton"
+                v-on:click="onNextScene">
+                Következő jelenet
+            </md-button>
         </div>
     </div>
 </template>
@@ -65,24 +70,34 @@ export default {
           actorsWidth: localStorage.getItem('actorsWidth'),
           showGivePoints: true,
           pylonWidth: 50,
+          namesDivWidth: 0,
           numberLength: 12,
           trans: false,
+          showNextSceneButton: false,
       }
+  },
+  mounted() {
+    this.countNamesWidth();
   },
   methods: {
     onPoints(points) {
         for(let i = 0; i < this.actorsInPlay.length; i++) {
             this.actorsInPlay[i].points += points;
         }
-        for(let i = 0; i < this.actorList.length; i++) {
-            let actor = this.actorList[i];
-            actor.pylonHeight = actor.points * 5;
-        }
         this.showGivePoints = false;
         this.trans = true;
         setTimeout(() => {
             this.addNewPoints();
         }, 1000)
+        setTimeout(() => {
+            this.showNextSceneButton = true;
+        }, 3500)
+    },
+    countNamesWidth() {
+        for(let i = 0; i < this.actorList.length; i++) {
+            this.namesDivWidth += this.actorList[i].nameLength;
+        }
+        this.namesDivWidth += this.actorList.length * 50 + 1;
     },
     addNewPoints() {
         for(let i = 0; i < this.actorsInPlay.length; i++) {
@@ -91,12 +106,17 @@ export default {
                 let actorInPlay = this.actorsInPlay[i];
                 if (actor.name === actorInPlay.name && actor.points !== actorInPlay.points) {
                     actor.points = actorInPlay.points;
-                    actor.pylonHeight += actorInPlay.points * 5;
+                    actor.pylonHeight = actorInPlay.points * 10;
                 }
             }
         }
+        this.actorsInPlay = [];
+        localStorage.setItem('actorsInPlay', JSON.stringify(this.actorsInPlay));
         localStorage.setItem('actorList', JSON.stringify(this.actorList));
     },
+    onNextScene() {
+        this.$router.push('/game');
+    }
     
   },
   props: {}
@@ -105,6 +125,10 @@ export default {
 
 
 <style scoped>
+.sumPoints {
+    margin: auto;
+}
+
 .points-container {
     margin-top: 20px;
 }
@@ -130,15 +154,11 @@ export default {
     background-color: red;
     color: white;
     display: inline-block;
-    -webkit-transition: height 5s;
-    transition: height 5s;
+    -webkit-transition: height 3s;
+    transition: height 3s;
     
 }
 
-.increase-pylon {
-    
-    
-}
 .list-item {
     display: inline-block;
     margin: 15px 20px;
@@ -186,6 +206,11 @@ export default {
     height: 120px;
     border-radius: 60px;
     font-size: 36pt;
+}
+
+.next-scene-button {
+    background-color: #3b3bda;
+    color: white; 
 }
 
 #number-1 {
