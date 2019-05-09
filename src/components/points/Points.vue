@@ -49,6 +49,10 @@
                     </span>
                 </div>
             </div>
+            <md-field class="actor-number-input" v-if="isRoundEnd">
+                <label>Színészek száma:</label>
+                <md-input v-model="pointLimit" type="number" class="input"></md-input>
+            </md-field>
             <md-button 
                 class="md-primary next-scene-button"
                 v-if="showNextSceneButton"
@@ -60,7 +64,7 @@
 </template>
 
 <script>
-import { setInterval, setTimeout } from 'timers';
+import { setTimeout } from 'timers';
 export default {
   name: 'Points',
   data() {
@@ -74,12 +78,32 @@ export default {
           numberLength: 12,
           trans: false,
           showNextSceneButton: false,
+          isRoundEnd: false,
+          pointLimit: '',
       }
   },
   mounted() {
     this.countNamesWidth();
   },
   methods: {
+    onNextScene() {
+        if (this.pointLimit !== '') {
+            this.dropActors();
+        }
+        this.$router.push('/game');
+    },  
+    dropActors() {
+        const limit = parseInt(this.pointLimit);
+        let remainingActors = [];
+        for(let i = 0; i < this.actorList.length; i++) {
+            if (this.actorList[i].points >= limit) {
+                remainingActors.push(this.actorList[i]);
+            }
+        }
+        this.actorList = remainingActors;
+        localStorage.setItem('actorList', JSON.stringify(this.actorList));
+        localStorage.setItem('actorsToPick', JSON.stringify(this.actorList)); 
+    },
     onPoints(points) {
         for(let i = 0; i < this.actorsInPlay.length; i++) {
             this.actorsInPlay[i].points += points;
@@ -91,7 +115,14 @@ export default {
         }, 1000)
         setTimeout(() => {
             this.showNextSceneButton = true;
+            this.checkIfMoreActorsThisRound();
         }, 3500)
+    },
+    checkIfMoreActorsThisRound() {
+        const actorsToPick = JSON.parse(localStorage.getItem("actorsToPick"));
+        if (actorsToPick.length === 0) {
+            this.isRoundEnd = true;
+        }
     },
     countNamesWidth() {
         for(let i = 0; i < this.actorList.length; i++) {
@@ -114,9 +145,23 @@ export default {
         localStorage.setItem('actorsInPlay', JSON.stringify(this.actorsInPlay));
         localStorage.setItem('actorList', JSON.stringify(this.actorList));
     },
-    onNextScene() {
-        this.$router.push('/game');
-    }
+    // checkLimit() {
+    //     let min = 1;
+    //     let max = 100;
+    //     for (let i = 0; i < this.actorList.length; i++) {
+    //         const actor = this.actorList[i];
+    //         if (min < actor.points) {
+    //             min = actor.points
+    //         }
+    //         if (max > actor.points) {
+    //             max = actor.points;
+    //         }
+    //     }
+    //     const num = parseInt(this.pointLimit);
+    //     if (num < min || num > max) {
+    //         this.pointLimit = '';
+    //     }
+    // },
     
   },
   props: {}
@@ -211,6 +256,27 @@ export default {
 .next-scene-button {
     background-color: #3b3bda;
     color: white; 
+}
+
+.actor-number-input {
+  width: 250px;
+  height: 50px;
+  border-bottom: 1px solid blue;
+  margin: auto;
+}
+
+.input {
+  color: white;
+  text-align: center;
+}
+
+input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+ 
+input[type="number"] {
+    -moz-appearance: textfield;
 }
 
 #number-1 {

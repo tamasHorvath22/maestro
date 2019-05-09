@@ -102,7 +102,6 @@ export default {
         if (this.actorsWidth > this.randomWidth) {
             this.addInlineToSelectedActors();
         }
-        console.log(this.actorsInPlay);
         this.randomActorIntervalId = setInterval(() => {
             this.add();
         }, 1000);
@@ -208,10 +207,6 @@ input[type="number"] {
 .container {
     text-align: left;
     display:flex;
-}
-
-.actors-container {
-  /* text-align: center; */
 }
 
 .actor {
