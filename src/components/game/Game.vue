@@ -22,7 +22,7 @@
             </div>
             
             <div class="selected-actors" id="selected-actors" :style="{ width: actorsWidth + 'px' }">
-              <transition-group name="list" tag="div" class="actors-container">
+              <transition-group name="bounce" tag="div" class="actors-container">
                   <span v-for="item of actorsInPlay" v-bind:key="item.name" class="list-item">
                     {{ item.name }}
                   </span>
@@ -271,8 +271,8 @@ input[type="number"] {
   margin-top: 80px;
 }
 
-/* .bounce-enter-active {
-  animation: bounce-in 1.5s;
+.bounce-enter-active {
+  animation: bounce-in 4.5s;
 }
 .bounce-leave-active {
   animation: bounce-in 1.5s reverse;
@@ -280,13 +280,16 @@ input[type="number"] {
 @keyframes bounce-in {
   0% {
     transform: scale(0);
+    opacity: 0;
   }
   50% {
     transform: scale(1.5);
+    opacity: 1;
   }
   100% {
-    transform: scale(1);
+    transform: scale(3);
+    opacity: 0;
   }
-} */
+}
 
 </style>

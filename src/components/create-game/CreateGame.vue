@@ -1,18 +1,22 @@
 <template>
     <div class="container">
-            <div class="sub-container">
-                <div class="actor-store">
-                    <p class="label">Színész raktár</p>
-                    <md-field class="input">
-                        <label>Add a nevet!</label>
-                        <md-input v-model="actorToStore" v-on:keyup.enter="addActorToStore" class="input-field"></md-input>
-                    </md-field>
-                    <div v-for="(actor, index) of actorStore" :key="actor" class="actor-container">
-                        <span class="actor-name">{{ actor }}</span>
-                        <span v-on:click="removeActorFromStore(index)" class="remove-actor" title="törlés">-</span>
-                        <span v-on:click="addActorToGame(index)" class="add-actor-to-game" title="játékhoz az">+</span>
-                    </div>
+        <div class="sub-container">
+            <div class="actor-store">
+                <p class="label">Színész raktár</p>
+                <md-field class="input">
+                    <label>Add a nevet!</label>
+                    <md-input v-model="actorToStore" v-on:keyup.enter="addActorToStore" class="input-field"></md-input>
+                </md-field>
+                <div v-for="(actor, index) of actorStore" :key="actor" class="actor-container">
+                    <span class="actor-name">{{ actor }}</span>
+                    <span v-on:click="removeActorFromStore(index)" class="remove-actor" title="törlés">
+                        <font-awesome-icon icon="minus" class="remove-icon"/>
+                    </span>
+                    <span v-on:click="addActorToGame(index)" class="add-actor-to-game" title="játékhoz az">
+                        <font-awesome-icon icon="user-plus" class="add-actor-icon"/>
+                    </span>
                 </div>
+            </div>
 
             <div class="create-game">
                 <p class="label">Új játék</p>
@@ -22,7 +26,9 @@
                 </md-field>
                 <div v-for="(actor, index) of actorList" :key="actor.name" class="actor-container">
                     <span class="actor-name">{{ actor.name }}</span>
-                    <span v-on:click="removeActor(index)" class="remove-actor" title="törlés">-</span>
+                    <span v-on:click="removeActor(index)" class="remove-actor" title="törlés">
+                        <font-awesome-icon icon="minus" class="remove-icon"/>
+                    </span>
                 </div>
                 <md-button
                     class="md-raised md-primary start-button"
@@ -116,6 +122,22 @@ export default {
 
 
 <style scoped>
+
+.remove-icon {
+  font-size: 14pt;
+  color: white;
+  padding-top: 2px;
+  padding-left: 1px;
+
+}
+
+.add-actor-icon {
+  font-size: 13pt;
+  color: white;
+  padding-top: 2px;
+  padding-left: 1px;
+}
+
 .sub-container {
     display: flex;
     margin-left: 20vw;
@@ -138,25 +160,27 @@ export default {
 
 .remove-actor {
   float: right;
-  background-color: #e64a4a;
-  width: 20px;
-  height: 20px;
+  background-color: #de4b4b;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
   border-radius: 50%;
   text-align: center;
   color: white;
+  cursor: pointer;
 }
 
 .add-actor-to-game {
   margin-right: 10px;
   float: right;
-  background-color: green;
-  width: 20px;
-  height: 20px;
+  background-color: #36c336;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
-  border-radius: 50%;
   text-align: center;
   color: white;
+  border-radius: 2px;
+  cursor: pointer;
 }
 
 .actor-name {
